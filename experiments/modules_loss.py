@@ -6,6 +6,7 @@ import sys
 
 sys.path.append("../")
 import config
+import lpips
 
 
 class VGGPerceptualLoss(nn.Module):
@@ -63,13 +64,12 @@ class LPIPS(nn.Module):
     def forward(self, es, ta):
         if self.mod is None:
             sys.path.append(str(config.lpips_root))
-            import PerceptualSimilarity.models as ps
-
-            self.mod = ps.PerceptualLoss()
+            self.mod = lpips.LPIPS(net='vgg').to(device=config.eval_device)
 
         if self.clip:
             es = torch.clamp(es, -1, 1)
-        out = self.mod(es, ta, normalize=False)
+            
+        out = self.mod(es, ta)
 
         return out.mean()
 
