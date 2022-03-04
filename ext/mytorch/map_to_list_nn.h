@@ -18,10 +18,10 @@ struct MapToListNnForward {
                        const Tensor2<T> srcpos, Tensor2<T> out)
         : features(features), nbidx(nbidx), srcpos(srcpos), out(out) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems]
-        const long batch_size = features.shape[0];
-        const long channels = features.shape[2];
+        const int64_t batch_size = features.shape[0];
+        const int64_t channels = features.shape[2];
 
         const int bidx = nbidx(idx) % batch_size;
         const int vidx = nbidx(idx) / batch_size;
@@ -32,7 +32,7 @@ struct MapToListNnForward {
         const int w = srcpos(idx, 1);
         // We further assume that srcpos are all valid (inside map)
 
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             out(idx, c) = features(bidx, vidx, c, h, w);
         }
     }
@@ -54,17 +54,17 @@ struct MapToListNnBackward {
           grad_out(grad_out),
           grad_features(grad_features) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems]
-        const long batch_size = grad_features.shape[0];
-        const long channels = grad_features.shape[2];
+        const int64_t batch_size = grad_features.shape[0];
+        const int64_t channels = grad_features.shape[2];
 
         const int bidx = nbidx(idx) % batch_size;
         const int vidx = nbidx(idx) / batch_size;
         const int h = srcpos(idx, 0);
         const int w = srcpos(idx, 1);
 
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             co_atomic_add(grad_features.ptridx(bidx, vidx, c, h, w),
                           grad_out(idx, c));
         }

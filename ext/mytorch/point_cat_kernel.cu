@@ -8,7 +8,7 @@ void point_cat_forward_kernel(at::Tensor in_features, at::Tensor key, int n_cat,
         out_features.scalar_type(), "PointCatForward", ([&] {
             iterate_cuda(
                 PointCatForward<scalar_t>(torch2co2<scalar_t>(in_features),
-                                          torch2co1<long>(key), n_cat,
+                                          torch2co1<int64_t>(key), n_cat,
                                           torch2co2<scalar_t>(out_features)),
                 key.size(0) - 1);
         }));
@@ -19,7 +19,7 @@ void point_cat_backward_kernel(at::Tensor grad_out_features, at::Tensor key,
         grad_in_features.scalar_type(), "PointCatBackward", ([&] {
             iterate_cuda(PointCatBackward<scalar_t>(
                              torch2co2<scalar_t>(grad_out_features),
-                             torch2co1<long>(key), n_cat,
+                             torch2co1<int64_t>(key), n_cat,
                              torch2co2<scalar_t>(grad_in_features)),
                          grad_out_features.size(0));
         }));

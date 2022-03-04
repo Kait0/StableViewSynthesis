@@ -20,11 +20,11 @@ struct ListToMapForward {
           out_sum(out_sum),
           out_mask(out_mask) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems]
-        const long channels = out_sum.shape[1];
-        const long height = out_sum.shape[2];
-        const long width = out_sum.shape[3];
+        const int64_t channels = out_sum.shape[1];
+        const int64_t height = out_sum.shape[2];
+        const int64_t width = out_sum.shape[3];
 
         // tgtidx = bidx * height * width + h * width + w
         const int tgtidx_ = tgtidx(idx);
@@ -32,7 +32,7 @@ struct ListToMapForward {
         const int h = (tgtidx_ / width) % height;
         const int bidx = tgtidx_ / (height * width);
 
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             co_atomic_add(out_sum.ptridx(bidx, c, h, w), features(idx, c));
         }
         out_mask(bidx, 0, h, w) = 1;
@@ -52,11 +52,11 @@ struct ListToMapBackward {
           tgtidx(tgtidx),
           grad_features(grad_features) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems]
-        const long channels = grad_out_sum.shape[1];
-        const long height = grad_out_sum.shape[2];
-        const long width = grad_out_sum.shape[3];
+        const int64_t channels = grad_out_sum.shape[1];
+        const int64_t height = grad_out_sum.shape[2];
+        const int64_t width = grad_out_sum.shape[3];
 
         // tgtidx = bidx * height * width + h * width + w
         const int tgtidx_ = tgtidx(idx);
@@ -64,7 +64,7 @@ struct ListToMapBackward {
         const int h = (tgtidx_ / width) % height;
         const int bidx = tgtidx_ / (height * width);
 
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             grad_features(idx, c) = grad_out_sum(bidx, c, h, w);
         }
     }

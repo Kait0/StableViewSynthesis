@@ -18,12 +18,12 @@ struct MapToListBlForward {
                        const Tensor2<T> srcpos, Tensor2<T> out)
         : features(features), nbidx(nbidx), srcpos(srcpos), out(out) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems]
-        const long batch_size = features.shape[0];
-        const long channels = features.shape[2];
-        const long height = features.shape[3];
-        const long width = features.shape[4];
+        const int64_t batch_size = features.shape[0];
+        const int64_t channels = features.shape[2];
+        const int64_t height = features.shape[3];
+        const int64_t width = features.shape[4];
 
         const int nbidx_ = nbidx(idx);
         const int bidx = nbidx_ % batch_size;
@@ -48,7 +48,7 @@ struct MapToListBlForward {
         h1 = co_min(co_max(h1, T(0)), T(height - 1));
         h2 = co_min(co_max(h2, T(0)), T(height - 1));
 
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             out(idx, c) = features(bidx, vidx, c, h1, w1) * th1 * tw1 +
                           features(bidx, vidx, c, h1, w2) * th1 * tw2 +
                           features(bidx, vidx, c, h2, w1) * th2 * tw1 +
@@ -73,12 +73,12 @@ struct MapToListBlBackward {
           grad_out(grad_out),
           grad_features(grad_features) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems]
-        const long batch_size = grad_features.shape[0];
-        const long channels = grad_features.shape[2];
-        const long height = grad_features.shape[3];
-        const long width = grad_features.shape[4];
+        const int64_t batch_size = grad_features.shape[0];
+        const int64_t channels = grad_features.shape[2];
+        const int64_t height = grad_features.shape[3];
+        const int64_t width = grad_features.shape[4];
 
         const int nbidx_ = nbidx(idx);
         const int bidx = nbidx_ % batch_size;
@@ -102,7 +102,7 @@ struct MapToListBlBackward {
         h1 = co_min(co_max(h1, T(0)), T(height - 1));
         h2 = co_min(co_max(h2, T(0)), T(height - 1));
 
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             const T go = grad_out(idx, c);
             co_atomic_add(grad_features.ptridx(bidx, vidx, c, h1, w1),
                           th1 * tw1 * go);

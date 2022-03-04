@@ -18,12 +18,12 @@ struct MapToListBlSeqForward {
                           const Tensor2<T> srcpos, Tensor2<T> out)
         : features(features), tgtidx(tgtidx), srcpos(srcpos), out(out) {}
 
-    CPU_GPU_FUNCTION void operator()(long idx) {
+    CPU_GPU_FUNCTION void operator()(int64_t idx) {
         // idx \in [0, n_elems_feat]
 
-        const long channels = features.shape[0];
-        const long height = features.shape[1];
-        const long width = features.shape[2];
+        const int64_t channels = features.shape[0];
+        const int64_t height = features.shape[1];
+        const int64_t width = features.shape[2];
 
         // Pixel center is assumed to be at x+0.5, y+0.5
         const T h = srcpos(idx, 0);
@@ -48,7 +48,7 @@ struct MapToListBlSeqForward {
         // if (out_idx > out.shape[0]) {
         //     printf("out_idx %d > out.shape[0] %ld\n", out_idx, out.shape[0]);
         // }
-        for (long c = 0; c < channels; ++c) {
+        for (int64_t c = 0; c < channels; ++c) {
             out(out_idx, c) = features(c, h1, w1) * th1 * tw1 +
                               features(c, h1, w2) * th1 * tw2 +
                               features(c, h2, w1) * th2 * tw1 +

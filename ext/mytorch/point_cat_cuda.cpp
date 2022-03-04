@@ -6,9 +6,9 @@ void point_cat_forward_kernel(at::Tensor in_features, at::Tensor key, int n_cat,
 at::Tensor point_cat_forward(at::Tensor in_features, at::Tensor key,
                              int n_cat) {
     CHECK_INPUT_CUDA_DIM(in_features, 2);
-    const long channels = in_features.size(1);
+    const int64_t channels = in_features.size(1);
     CHECK_INPUT_CUDA_DIM(key, 1);
-    const long prefix_sum = key.size(0);
+    const int64_t prefix_sum = key.size(0);
 
     auto out_features =
         torch::zeros({prefix_sum - 1, n_cat * channels},
@@ -28,8 +28,8 @@ void point_cat_backward_kernel(at::Tensor grad_out_features, at::Tensor key,
 at::Tensor point_cat_backward(at::Tensor grad_out_features, at::Tensor key,
                               int n_cat, int nelems) {
     CHECK_INPUT_CUDA_DIM(grad_out_features, 2);
-    const long prefix_sum = grad_out_features.size(0) + 1;
-    const long channels = grad_out_features.size(1) / n_cat;
+    const int64_t prefix_sum = grad_out_features.size(0) + 1;
+    const int64_t channels = grad_out_features.size(1) / n_cat;
     CHECK_INPUT_CUDA_DIM(key, 1);
     AT_ASSERTM(key.size(0) == 1 * prefix_sum,
                "prefix_sum of key does not match");
