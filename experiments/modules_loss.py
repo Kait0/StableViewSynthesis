@@ -129,3 +129,10 @@ class L1Loss(nn.Module):
 
     def forward(self, es, ta):
         return [F.l1_loss(es, ta)]
+
+class L2Loss(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, es, ta):
+        return [F.mse_loss(es, ta)]

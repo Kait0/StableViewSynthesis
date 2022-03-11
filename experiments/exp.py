@@ -102,6 +102,8 @@ class Worker(co.mytorch.Worker):
             self.train_loss = modules.SSIML1Loss()
         elif train_loss == "l1":
             self.train_loss = modules.SSIML1Loss()
+        elif train_loss == "l2":
+            self.train_loss = modules.L2Loss()
         else:
             raise Exception("invalid train loss")
 
